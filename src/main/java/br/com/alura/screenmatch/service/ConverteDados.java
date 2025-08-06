@@ -12,6 +12,7 @@ public class ConverteDados implements IConverteDados{
     public <T> T obterDados(String json, Class<T> classe) {
         //mapper - objeto do jackson que faz a conversão
         //leia o json, e transforme na "classe" que for passado como parâmetro
+        //metodo generic definido na interface iConverteDados
         try {
             return mapper.readValue(json, classe);
         } catch (JsonProcessingException e) {
