@@ -7,6 +7,7 @@ import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
+import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -67,9 +68,15 @@ public class Principal {
         System.out.println("\nOs 5 melhores episódios da série " + dadosSerie.titulo() + " :");
         dadosEpisodios.stream()
                 .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A")) //removendo da lista todos os episódio que não possuem avaliação
+                //.peek(e -> System.out.println("Primeiro filtro(n/a): " + e)) //peek serve mostrar o resultado de cada filtro/operação realizada no stream
                 .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed()) //ordenando de forma decrescente a lista comparando avaliação
+                //.peek(e -> System.out.println("Ordenação: " + e))
                 .limit(5)
+                //.peek(e -> System.out.println("Limitanto a 5: " + e))
+                .map(e -> e.titulo().toUpperCase())
+                //.peek(e -> System.out.println("Convertendo para maiúscula: " + e))
                 .forEach(System.out::println);
+        System.out.println("--------------------------------------------------------------------------");
 
         List<Episodio> episodios = temporadas.stream()
                 .flatMap(t -> t.episodios().stream()
@@ -78,7 +85,21 @@ public class Principal {
                 .collect(Collectors.toList());
 
         episodios.forEach(System.out::println);
+        System.out.println("--------------------------------------------------------------------------");
+        System.out.println("BUSCA DE QUAL TEMPORADA PERTENCE O EPISÓDIO");
+        System.out.println("Digite o nome/trecho do título do episódio:");
+        var trechoTitulo = leitura.nextLine();
+        Optional<Episodio> episodioBuscado = episodios.stream() //trabalhando com optional, pois pode ser q não encontre, nesse caso ficaria null
+                .filter(e -> e.getTitulo().toUpperCase().contains(trechoTitulo.toUpperCase())) //ambas informações convertidas para maiúscula, para não dar diferença na busca
+                .findFirst();
+        if (episodioBuscado.isPresent()){ //comando do optional, para verificar se o "conteiner" possui a informação
+            System.out.println("Episódio encontrado!");
+            System.out.println("Temporada: " + episodioBuscado.get().getTemporada()); //o .get() é para acessar o elemento dentro do conteiner
+        }else{
+            System.out.println("Episódio não encontrado!");
+        }
 
+        System.out.println("--------------------------------------------------------------------------");
         System.out.println("A partir de que ano você deseja ver os episódios? ");
         var ano = leitura.nextInt();
         leitura.nextLine(); //é necessário após usarmos um nextInt
@@ -94,5 +115,24 @@ public class Principal {
                                 " Data de lançamento: " + e.getDataLancamento().format(formatador)
                 ));
 
+        //Agr o desafioo, é criar uma média de avaliação por temporada. A api consultada não possui essa informação
+        System.out.println("--------------------------------------------------------------------------");
+        System.out.println("Média de avaliações por Temporada: ");
+        Map<Integer, Double> avaliacesPorTemporada = episodios.stream()
+                .filter(e -> e.getAvaliacao() > 0.0)
+                .collect(Collectors.groupingBy(Episodio::getTemporada, //agrupando por temporada
+                        Collectors.averagingDouble(Episodio::getAvaliacao))); //fazendo média da avaliação
+        System.out.println(avaliacesPorTemporada);
+
+        //DoubleSummaryStatistics é uma classe que gera estatísticas
+        System.out.println("Estatísticas das temporadas:");
+        DoubleSummaryStatistics est = episodios.stream()
+                .filter(e -> e.getAvaliacao() > 0.0)
+                .collect(Collectors.summarizingDouble(Episodio::getAvaliacao)); //informando qual atributo queremos as estatísticas
+
+        System.out.println("Média de avaliação dos episódios: " + est.getAverage());
+        System.out.println("Melhor avaliação: " + est.getMax());
+        System.out.println("Menor avaliação: " + est.getMin());
+        System.out.println("Quantidade de episódios avaliadas: " + est.getCount());
     }
 }

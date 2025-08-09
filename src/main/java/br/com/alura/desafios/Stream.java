@@ -91,7 +91,6 @@ public class Stream {
 
     }
 
-
     private static boolean ehPrimo(int numero) {
         if (numero < 2) return false; // Números menores que 2 não são primos
         for (int i = 2; i <= Math.sqrt(numero); i++) {
