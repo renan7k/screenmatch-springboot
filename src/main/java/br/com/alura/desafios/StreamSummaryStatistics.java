@@ -37,6 +37,7 @@ public class StreamSummaryStatistics {
         List<String> nomes = Arrays.asList("Alice", "Bob", "Charlie");
         String resultado = nomes.stream()
                 .collect(Collectors.joining(", "));
+        
         System.out.println(resultado);
 
         //4 - Dada a lista de números inteiros abaixo, calcule a soma dos quadrados dos números pares.
