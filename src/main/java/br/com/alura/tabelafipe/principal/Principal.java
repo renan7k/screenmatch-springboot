@@ -2,12 +2,15 @@ package br.com.alura.tabelafipe.principal;
 
 import br.com.alura.tabelafipe.model.Dados;
 import br.com.alura.tabelafipe.model.Modelos;
+import br.com.alura.tabelafipe.model.Veiculo;
 import br.com.alura.tabelafipe.service.ConsumoAPI;
 import br.com.alura.tabelafipe.service.ConverteDados;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -60,10 +63,39 @@ public class Principal {
 
         System.out.println("\nModelos dessa marca: ");
 
-        //A classe modelos que tem uma lista de modelos, por isso chamamos a istância da classe.modelos() ->Lista
+        //A classe modelos que tem uma lista de modelos, por isso chamamos a instância da classe.modelos() ->Lista
         modeloLista.modelos().stream()
                 .sorted(Comparator.comparing(Dados::codigo))
                 .forEach(System.out::println);
 
+        //realizando 3º consulta, por modelos
+        System.out.println("Digite um trecho do nome do carro a ser buscado");
+        var nomeVeiculo = leitura.nextLine();
+        //crianod uma lista com os modelos existentes
+        List<Dados> modelosFiltrados = modeloLista.modelos().stream()
+                .filter(m -> m.nome().toLowerCase().contains(nomeVeiculo.toLowerCase()))
+                .collect(Collectors.toList());
+        System.out.println("\nModelos filtrados:");
+        modelosFiltrados.forEach(System.out::println);
+
+        System.out.println("Digite o código do modelo:");
+        var codigoModelo = leitura.nextLine();
+
+        endereco = endereco + "/" + codigoModelo + "/anos";
+        json = consumo.obterDados(endereco);
+
+        List<Dados> anos = convesor.obterLista(json, Dados.class);
+
+        List<Veiculo> veiculos = new ArrayList<>();
+        for (int i = 0; i < anos.size(); i++) {
+            //buscando modelos para cada ano que o carro existe. Ex: buscando celta 2011 e 2012
+            var enderecoAnos = endereco + "/" + anos.get(i).codigo();
+            json = consumo.obterDados(enderecoAnos);
+            Veiculo veiculo = convesor.obterDados(json, Veiculo.class);
+            veiculos.add(veiculo);
+        }
+
+        System.out.println("\nVeículos disponíveis: ");
+        veiculos.forEach(System.out::println);
     }
 }
