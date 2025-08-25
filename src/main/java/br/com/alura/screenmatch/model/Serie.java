@@ -1,5 +1,7 @@
 package br.com.alura.screenmatch.model;
 
+import br.com.alura.screenmatch.service.ConsultaChatGPT;
+
 import java.util.OptionalDouble;
 
 //Classe para tratar as informações , converter dados , para exibir da melhor forma ao cliente
@@ -24,7 +26,10 @@ public class Serie {
                 .trim()); //retornando apenas os caracteres. Tudo que for espaço em branco, quebra de linha, vai ser removido
         this.atores = dadosSerie.atores();
         this.poster = dadosSerie.poster();
-        this.sinopse = dadosSerie.sinopse();
+        this.sinopse = dadosSerie.sinopse(); //imprime sem traduzir
+
+        //conecta com a api do chatgpt, e traduz a sinopse. Necessário ter crédito, e atualizar o api key na classe ConsultaChatGPt
+        //this.sinopse = ConsultaChatGPT.obterTraducao(dadosSerie.sinopse()).trim();
     }
 
     public String getTitulo() {
