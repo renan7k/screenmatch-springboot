@@ -1,18 +1,35 @@
 package br.com.alura.screenmatch.model;
 
 import br.com.alura.screenmatch.service.ConsultaChatGPT;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalDouble;
 
+@Entity
+@Table(name = "series")
 //Classe para tratar as informações , converter dados , para exibir da melhor forma ao cliente
 public class Serie {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private  Long id;
+
+    @Column(unique = true)
     private String titulo;
     private Integer totalTemporadas;
     private Double avaliacao;
+
+    @Enumerated(EnumType.STRING)
     private Categoria genero;  //usando um ENUM, pois as categorias sempre são padrões/constantes. Assim limitamos as opções
     private String atores;
     private String sinopse;
     private String poster;
+
+    //1 série tem vários episodios, por isso temos que criar um relacionamento. Mas por enquanto, podemos deixar o atributo de lado
+    @Transient //essa anotação serve para dizer que o atributo não será salvo no db
+    private List<Episodio> episodios = new ArrayList<>();
+
 
     //construtor, que recebe DadosSerie, faz a associação de valores e transforma algumas informqções (avaliacao)
     public Serie(DadosSerie dadosSerie){
@@ -30,6 +47,22 @@ public class Serie {
 
         //conecta com a api do chatgpt, e traduz a sinopse. Necessário ter crédito, e atualizar o api key na classe ConsultaChatGPt
         //this.sinopse = ConsultaChatGPT.obterTraducao(dadosSerie.sinopse()).trim();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        this.episodios = episodios;
     }
 
     public String getTitulo() {

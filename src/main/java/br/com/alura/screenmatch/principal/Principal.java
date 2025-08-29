@@ -1,8 +1,10 @@
 package br.com.alura.screenmatch.principal;
 
 import br.com.alura.screenmatch.model.*;
+import br.com.alura.screenmatch.repository.SerieRepository;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +19,14 @@ public class Principal {
     private final String API_KEY = "&apikey=fcf2f961";
     private List<DadosSerie> dadosSeries = new ArrayList<>();
 
+    private SerieRepository repositorio;
+
+    //construtor recevendo o repository
+    //isso acontece pq temos que deixar o spring tomar conta (injeção de dependência), em uma classe que ele gerencia
+    //A principal , fomos nós que criamos. Portanto, deixamos a injeção de dependência na classe ScreenMatchApplication
+    public Principal(SerieRepository repositorio) {
+        this.repositorio = repositorio;
+    }
 
     public void exibeMenu() {
         var opcao = -1;
@@ -54,7 +64,10 @@ public class Principal {
 
     private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
-        dadosSeries.add(dados);  //adicionando série na lista de séries
+        Serie serie = new Serie(dados); //transformando
+        //dadosSeries.add(dados);  //adicionando série na lista de séries
+        //agora, não vamos mais adicionar na lista , e sim no SerieRepository, para isso usamos injeção de dependência
+        repositorio.save(serie); //salvando no banco
         System.out.println(dados);
     }
 
