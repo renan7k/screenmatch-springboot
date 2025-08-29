@@ -93,10 +93,13 @@ public class Principal {
 
     private void listarSeriesBuscadas(){
         //antes estávamos imprimindo a lista dadosSeries, mas após criamos a Serie, estamos passando de uma lista para outra
-        List<Serie> series = new ArrayList<>();
-        series =  dadosSeries.stream()
-                        .map(d -> new Serie(d))
-                                .collect(Collectors.toList());
+        //List<Serie> series = new ArrayList<>();
+//        series =  dadosSeries.stream()
+//                        .map(d -> new Serie(d))
+//                                .collect(Collectors.toList());
+        //estamos deixando de buscar na lista , para buscar no banco de dados
+        //findall já é um metodo do JPA, usado para buscar todos os objetos grvados na base
+        List<Serie> series = repositorio.findAll();
 
         //ordenando pelo genero/categoria
         series.stream()

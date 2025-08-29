@@ -49,6 +49,9 @@ public class Serie {
         //this.sinopse = ConsultaChatGPT.obterTraducao(dadosSerie.sinopse()).trim();
     }
 
+    //construtor padrao, exigido pela JPA
+    public Serie(){}
+
     public Long getId() {
         return id;
     }
