@@ -21,6 +21,9 @@ public class Principal {
 
     private SerieRepository repositorio;
 
+    //lista para ser usado no listar series
+    private List<Serie> series = new ArrayList<>();
+
     //construtor recevendo o repository
     //isso acontece pq temos que deixar o spring tomar conta (injeção de dependência), em uma classe que ele gerencia
     //A principal , fomos nós que criamos. Portanto, deixamos a injeção de dependência na classe ScreenMatchApplication
@@ -30,7 +33,7 @@ public class Principal {
 
     public void exibeMenu() {
         var opcao = -1;
-        while (opcao != 0 ) {
+        while (opcao != 0) {
             var menu = """
                     1 - Buscar séries
                     2 - Buscar episódios
@@ -79,19 +82,43 @@ public class Principal {
         return dados;
     }
 
-    private void buscarEpisodioPorSerie(){
-        DadosSerie dadosSerie = getDadosSerie();
-        List<DadosTemporada> temporadas = new ArrayList<>();
+    private void buscarEpisodioPorSerie() {
+        //DadosSerie dadosSerie = getDadosSerie();
+        listarSeriesBuscadas();
+        System.out.println("Escolha uma série pelo nome: ");
+        var nomeSerie = leitura.nextLine();
 
-        for (int i = 1; i <= dadosSerie.totalTemporadas(); i++) {
-            var json = consumo.obterDados(ENDERECO + dadosSerie.titulo().replace(" ", "+") + "&season=" + i + API_KEY);
-            DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
-            temporadas.add(dadosTemporada);
+        Optional<Serie> serie = series.stream()
+                .filter(s -> s.getTitulo().toLowerCase().contains(nomeSerie.toLowerCase()))
+                .findFirst();
+
+        if (serie.isPresent()) {
+            var serieEncontrada = serie.get();
+            List<DadosTemporada> temporadas = new ArrayList<>();
+
+            for (int i = 1; i <= serieEncontrada.getTotalTemporadas(); i++) {
+                var json = consumo.obterDados(ENDERECO + serieEncontrada.getTitulo().replace(" ", "+") + "&season=" + i + API_KEY);
+                DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
+                temporadas.add(dadosTemporada);
+            }
+            temporadas.forEach(System.out::println);
+            //salvando os episodios na base
+           List<Episodio> episodios = temporadas.stream()
+                    .flatMap(d -> d.episodios().stream()
+                            .map(e -> new Episodio(d.numero(), e)))
+                    .collect(Collectors.toList());
+           //encontrando a serie e modificando os episodios que tem dentro dela
+           serieEncontrada.setEpisodios(episodios);
+           repositorio.save(serieEncontrada);
+
+        } else {
+            System.out.println("Série não encontrada.");
         }
-        temporadas.forEach(System.out::println);
+
+
     }
 
-    private void listarSeriesBuscadas(){
+    private void listarSeriesBuscadas() {
         //antes estávamos imprimindo a lista dadosSeries, mas após criamos a Serie, estamos passando de uma lista para outra
         //List<Serie> series = new ArrayList<>();
 //        series =  dadosSeries.stream()
@@ -99,7 +126,7 @@ public class Principal {
 //                                .collect(Collectors.toList());
         //estamos deixando de buscar na lista , para buscar no banco de dados
         //findall já é um metodo do JPA, usado para buscar todos os objetos grvados na base
-        List<Serie> series = repositorio.findAll();
+        series = repositorio.findAll();
 
         //ordenando pelo genero/categoria
         series.stream()

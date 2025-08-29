@@ -26,8 +26,9 @@ public class Serie {
     private String sinopse;
     private String poster;
 
-    //1 série tem vários episodios, por isso temos que criar um relacionamento. Mas por enquanto, podemos deixar o atributo de lado
-    @Transient //essa anotação serve para dizer que o atributo não será salvo no db
+    //1 série tem vários episodios, por isso temos que criar um relacionamento.
+    //mappedBy = serie, indica o atributo da outra classe (episodi) que vai fazer o relacionamento
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL) //cascade - indica que se modificar serie, modifica episodia , e vice versa
     private List<Episodio> episodios = new ArrayList<>();
 
 

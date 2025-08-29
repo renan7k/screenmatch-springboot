@@ -1,17 +1,31 @@
 package br.com.alura.screenmatch.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
 //No projeto já temos a DadosEpisodio como Record, mas ela existe principalmente por conta do retorno da api, para mapear os dados
 //Pensando em negócio, vamos criar uma classe Episodio , pois vamos ter métodos, validações, tratamentos, e provével que se torne uma entidade no nosso banco de dados
+@Entity
+@Table(name = "episodios")
 public class Episodio {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private  Long id;
+
     private Integer temporada;
     private String titulo;
     private Integer numeroEpisodio;
     private Double avaliacao;
     private LocalDate dataLancamento;
+
+    //criando atributo serie, para informar também a relação para o JPA
+    //no banco, devido ao relacionamento, vai ser criado uma chave estrangeira serie_id
+    @ManyToOne
+    private Serie serie;
+
 
     public Episodio(Integer numeroTemporada, DadosEpisodio dadosEpisodios) {
         this.temporada = numeroTemporada;
@@ -32,6 +46,22 @@ public class Episodio {
             this.dataLancamento = null;
         }
 
+    }
+    public Episodio (){ };
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Serie getSerie() {
+        return serie;
+    }
+
+    public void setSerie(Serie serie) {
+        this.serie = serie;
     }
 
     public Integer getTemporada() {
