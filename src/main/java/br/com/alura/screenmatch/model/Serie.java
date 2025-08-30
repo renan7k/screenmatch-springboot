@@ -28,7 +28,8 @@ public class Serie {
 
     //1 série tem vários episodios, por isso temos que criar um relacionamento.
     //mappedBy = serie, indica o atributo da outra classe (episodi) que vai fazer o relacionamento
-    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL) //cascade - indica que se modificar serie, modifica episodia , e vice versa
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER) //fetch = tipo de carregamento das entidades
+    //cascade - indica que se modificar serie, modifica episodia , e vice versa
     private List<Episodio> episodios = new ArrayList<>();
 
 
@@ -66,6 +67,8 @@ public class Serie {
     }
 
     public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e -> e.setSerie(this)); //setando a chave estrangeira em episodios
+        //o this acima, especifica que essa serie é dona do episódio
         this.episodios = episodios;
     }
 
@@ -134,7 +137,7 @@ public class Serie {
                 ", avaliacao=" + avaliacao +
                 ", atores=" + atores + '\'' +
                 ", sinopse=" + sinopse + '\'' +
-                ", poster=" + poster + '\''
-                ;
+                ", poster=" + poster + '\'' +
+                ", episodios=" + episodios + '\'';
     }
 }
