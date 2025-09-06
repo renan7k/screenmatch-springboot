@@ -3,6 +3,7 @@ package br.com.alura.screenmatch.repository;
 import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.Serie;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,5 +22,12 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
 
     List<Serie> findByGenero(Categoria categoria); //busca por enum
 
+    //menor igual e maior igual
     List<Serie> findByTotalTemporadasLessThanEqualAndAvaliacaoGreaterThanEqual(int totalTemporadas, double avaliacao);
+
+    //Usando o JPQA, @QUERIE, serve para simplificar a busca podendo usar o select em sql, substiruindo o metodo acima
+    //e o JPQL, linguagem de consulta da JPA
+    //os ":" serve paraa indicar que os atributos vem do parâmetro
+    @Query("select s from Serie s WHERE s.totalTemporadas <= :totalTemporadas AND s.avaliacao >= :avaliacao")
+    List<Serie> seriesPorTemporadaEAvaliacao(int totalTemporadas, double avaliacao);
 }
