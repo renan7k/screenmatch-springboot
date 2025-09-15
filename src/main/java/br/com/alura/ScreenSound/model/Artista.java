@@ -19,8 +19,15 @@ public class Artista {
     @Enumerated(EnumType.STRING)
     private TipoArtista tipo;
 
-    @OneToMany(mappedBy = "artista") //estabelecendo quem está mapeando a lista de música no relacionamento bidirecional
+    @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, fetch = FetchType.EAGER) //estabelecendo quem está mapeando a lista de música no relacionamento bidirecional
     private List<Musica> musicas = new ArrayList<>();
+
+    public Artista (){}
+
+    public Artista(String nome, TipoArtista tipo) {
+        this.nome = nome;
+        this.tipo = tipo;
+    }
 
     public Long getId() {
         return id;
